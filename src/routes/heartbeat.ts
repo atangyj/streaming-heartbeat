@@ -24,13 +24,20 @@ router.get('/heartbeat', async(ctx)=> {
     // Concurrency limit
     // TODO: Get limit from config
     const limit = 3;
-    console.log(activeStreams.length);
-    if(activeStreams.length >= limit){
-        console.log('reach limit');
+    const exceedStreams = activeStreams.length - limit;
+    if(exceedStreams === 0){
+        console.log(`exceed limit by ${exceedStreams}`);
         ctx.status = 404;
+    } else if(exceedStreams > 0){
+    // Handle scenario that more than limited streams are playing due to race condition
+        const newestStreamReq = activeStreams[activeStreams.length - 1];
+        if(streamId === newestStreamReq.value){
+            await redisClient.zPopMax(userId);
+            ctx.status = 404;
+        }
     } else {
-        // Allow request
-        redisClient.zAdd(userId, [{score: reqTime, value: streamId}]);
+    // Allow request
+        await redisClient.zAdd(userId, [{score: reqTime, value: streamId}]);
         ctx.status = 200;
     };
 
