@@ -7,6 +7,7 @@ import Router from "koa-router";
 import { storeStream } from "src/helpers/storeStream";
 import { getActiveStreams } from "src/helpers/getActiveStreams";
 import { removeExceededStreams } from "src/helpers/removeExceededStreams";
+import { cleanOldRecords } from "src/helpers/cleanOldRecords";
 
 interface Query {
   userId: string;
@@ -18,11 +19,6 @@ const router = new Router();
 const timeout = Number(process.env.TIMEOUT);
 const concurrencyLimit = Number(process.env.CONCURRENCY_LIMIT);
 
-// u1 s1-ss1
-// u1 s1-ss1
-// u1 s1-ss2
-// u1 s1-ss2
-
 router.get("/heartbeat", async (ctx: Context) => {
   const { userId, streamId, sessionId } = ctx.query as unknown as Query;
   const activeStreams = await getActiveStreams(userId, timeout);
@@ -33,22 +29,28 @@ router.get("/heartbeat", async (ctx: Context) => {
     console.log("stream requested");
     ctx.status = 200;
   } else if (activeStreams.length === concurrencyLimit) {
-    const isRequestActiveStream = activeStreams.find(
-      (s) => s.value === `${streamId}_${sessionId}`
-    );
+    const isRequestActiveStream = activeStreams.find((s) => {
+      const ssid = `${streamId}_${sessionId}`;
+      console.log(s.value, ssid);
+      return s.value === `${streamId}_${sessionId}`;
+    });
     if (isRequestActiveStream) {
       // Allow request active stream
       await storeStream(userId, streamId, sessionId);
-      console.log("stream requested");
+      console.log("reach stream requested and request same stream");
+
+      // Clean old records
+      cleanOldRecords(userId);
       ctx.status = 200;
     } else {
-      console.log("exceeded concurrency limit");
+      console.log("reach concurrency limit");
       ctx.status = 404;
     }
   } else {
     // Handle scenario that mulitple servers write into redis
     await removeExceededStreams(userId);
     console.log("remove exceeded stream");
+    ctx.status = 404;
   }
 });
 
