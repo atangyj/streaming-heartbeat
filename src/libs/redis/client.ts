@@ -1,9 +1,11 @@
-import { createClient } from 'redis';
+import { createClient } from "redis";
 
 const redisClient = createClient();
-redisClient.on('connect', ()=> {
-    console.log('connected')
+redisClient.on("connect", () => {
+  console.log("connected");
 });
-redisClient.connect();
+(async () => {
+  await redisClient.connect();
+})();
 
-export { redisClient }; 
+export { redisClient };
