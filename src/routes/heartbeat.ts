@@ -26,6 +26,7 @@ router.get("/heartbeat", async (ctx: Context) => {
   if (activeStreams.length < concurrencyLimit) {
     // Allow stream request
     await storeStream(userId, streamId, sessionId);
+    console.log(userId, streamId, sessionId);
     console.log("stream requested");
     ctx.status = 200;
   } else if (activeStreams.length === concurrencyLimit) {
