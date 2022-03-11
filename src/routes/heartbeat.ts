@@ -13,13 +13,13 @@ interface Query {
 }
 
 const router = new Router();
-const timeout = process.env.TIMEOUT;
-const concurrencyLimit = process.env.CONCURRENCY_LIMIT;
+const timeout = Number(process.env.TIMEOUT);
+const concurrencyLimit = Number(process.env.CONCURRENCY_LIMIT);
 
 router.get("/heartbeat", async (ctx) => {
   const { userId, streamId } = ctx.query as unknown as Query;
 
-  const activeStreams = await getActiveStreams(userId, timeout * 1000);
+  const activeStreams = await getActiveStreams(userId, timeout);
 
   if (activeStreams.length < concurrencyLimit) {
     // Allow stream request

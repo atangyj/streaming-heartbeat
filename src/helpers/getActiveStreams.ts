@@ -4,9 +4,10 @@ export const getActiveStreams = async (
   userId: string,
   timeInSeconds: number
 ) => {
-  const streams = await redisClient.zRangeWithScores(userId, 0, Date.now());
+  const timestamp = Date.now();
+  const streams = await redisClient.zRangeWithScores(userId, 0, timestamp);
   const activeStreams = streams.filter(
-    (s) => s.score > Date.now() - timeInSeconds * 1000
+    (s) => s.score > timestamp - timeInSeconds * 1000
   );
 
   return activeStreams;
