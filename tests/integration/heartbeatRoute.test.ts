@@ -41,4 +41,24 @@ describe("test heartbeat route", () => {
     expect(resp.status).toBe(404);
     expect(activeStreams.length).toBe(3);
   });
+
+  it("should return 200 if user requests active stream", async () => {
+    expect.hasAssertions();
+
+    // Arrange
+    const userId = uuidV4();
+    const streamId = uuidV4();
+
+    // Action
+    await request.get(`/heartbeat?userId=${userId}&streamId=${streamId}`);
+    await request.get(`/heartbeat?userId=${userId}&streamId=${uuidV4()}`);
+    await request.get(`/heartbeat?userId=${userId}&streamId=${uuidV4()}`);
+    const resp = await request.get(
+      `/heartbeat?userId=${userId}&streamId=${streamId}`
+    );
+
+    const activeStreams = await getActiveStreams(userId, 3);
+    // Assert
+    expect(resp.status).toBe(200);
+  });
 });

@@ -15,16 +15,10 @@ describe("test storeStreams function", () => {
     const timestamp = Date.now();
 
     // Action
-    try {
-      await storeStream(userId, streamId);
-    } catch (e) {
-      console.log(e);
-    }
+    await storeStream(userId, streamId);
 
     // Assert
     const record = await redisClient.zRangeWithScores(userId, 0, Date.now());
-    expect(record).toStrictEqual([
-      { score: timestamp, value: `${streamId}_${timestamp}` },
-    ]);
+    expect(record).toStrictEqual([{ score: timestamp, value: streamId }]);
   });
 });
