@@ -11,28 +11,34 @@ import { removeExceededStreams } from "src/helpers/removeExceededStreams";
 interface Query {
   userId: string;
   streamId: string;
+  sessionId: string;
 }
 
 const router = new Router();
 const timeout = Number(process.env.TIMEOUT);
 const concurrencyLimit = Number(process.env.CONCURRENCY_LIMIT);
 
+// u1 s1-ss1
+// u1 s1-ss1
+// u1 s1-ss2
+// u1 s1-ss2
+
 router.get("/heartbeat", async (ctx: Context) => {
-  const { userId, streamId } = ctx.query as unknown as Query;
+  const { userId, streamId, sessionId } = ctx.query as unknown as Query;
   const activeStreams = await getActiveStreams(userId, timeout);
 
   if (activeStreams.length < concurrencyLimit) {
     // Allow stream request
-    await storeStream(userId, streamId);
+    await storeStream(userId, streamId, sessionId);
     console.log("stream requested");
     ctx.status = 200;
   } else if (activeStreams.length === concurrencyLimit) {
     const isRequestActiveStream = activeStreams.find(
-      (s) => s.value === streamId
+      (s) => s.value === `${streamId}_${sessionId}`
     );
     if (isRequestActiveStream) {
       // Allow request active stream
-      await storeStream(userId, streamId);
+      await storeStream(userId, streamId, sessionId);
       console.log("stream requested");
       ctx.status = 200;
     } else {

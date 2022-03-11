@@ -14,10 +14,11 @@ describe("test storeStreams function", () => {
 
     // Arrange
     const userId = uuidV4();
+    const sessionId = uuidV4();
 
     // Action
-    await storeStream(userId, "foo");
-    await storeStream(userId, "bar");
+    await storeStream(userId, "foo", sessionId);
+    await storeStream(userId, "bar", sessionId);
     const sArr1 = await getActiveStreams(userId, 2);
 
     // Assert
@@ -25,7 +26,7 @@ describe("test storeStreams function", () => {
 
     // Action
     await sleep(2);
-    await storeStream(userId, "foobar");
+    await storeStream(userId, "foobar", sessionId);
     const sArr2 = await getActiveStreams(userId, 2);
     expect(sArr2.length).toBe(1);
   });
