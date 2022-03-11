@@ -14,8 +14,8 @@ describe("test removeExceededStreams function", () => {
     const streamId = uuidV4();
 
     // Action
-    await storeStream(userId, uuidV4());
-    await storeStream(userId, uuidV4());
+    await storeStream(userId, streamId);
+    await storeStream(userId, streamId);
     await storeStream(userId, streamId);
     await storeStream(userId, streamId);
     const activeS0 = await getActiveStreams(userId, 4);

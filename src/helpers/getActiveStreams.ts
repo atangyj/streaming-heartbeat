@@ -8,5 +8,6 @@ export const getActiveStreams = async (
   const activeStreams = streams.filter(
     (s) => s.score > Date.now() - timeInSeconds * 1000
   );
+
   return activeStreams;
 };
