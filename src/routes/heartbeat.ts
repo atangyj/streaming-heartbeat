@@ -9,6 +9,9 @@ import { getActiveStreams } from "src/helpers/getActiveStreams";
 import { removeExceededStreams } from "src/helpers/removeExceededStreams";
 import { cleanOldRecords } from "src/helpers/cleanOldRecords";
 
+// Util
+import { logger } from "src/utils/logger";
+
 interface Query {
   userId: string;
   streamId: string;
@@ -21,37 +24,46 @@ const concurrencyLimit = Number(process.env.CONCURRENCY_LIMIT);
 
 router.get("/heartbeat", async (ctx: Context) => {
   const { userId, streamId, sessionId } = ctx.query as unknown as Query;
-  const activeStreams = await getActiveStreams(userId, timeout);
+  // Validate queries
+  if (!userId || !streamId || !sessionId) {
+    const message = {
+      userId: userId || "missing",
+      streamId: streamId || "missing",
+      sessionId: sessionId || "missing",
+    };
 
+    ctx.throw(400, JSON.stringify(message));
+  }
+
+  const activeStreams = await getActiveStreams(userId, timeout);
+  // Under concurrency limit, accept request
   if (activeStreams.length < concurrencyLimit) {
-    // Allow stream request
     await storeStream(userId, streamId, sessionId);
-    console.log(userId, streamId, sessionId);
-    console.log("stream requested");
+    logger.info("stream requested");
     ctx.status = 200;
+
+    // Reach concurrency limit
   } else if (activeStreams.length === concurrencyLimit) {
-    const isRequestActiveStream = activeStreams.find((s) => {
-      const ssid = `${streamId}_${sessionId}`;
-      console.log(s.value, ssid);
-      return s.value === `${streamId}_${sessionId}`;
-    });
+    const isRequestActiveStream = activeStreams.find(
+      (s) => s.value === `${streamId}_${sessionId}`
+    );
+
+    // Accept request for active stream
     if (isRequestActiveStream) {
       // Allow request active stream
       await storeStream(userId, streamId, sessionId);
-      console.log("reach stream requested and request same stream");
+      logger.info("stream requested");
 
       // Clean old records
       cleanOldRecords(userId);
       ctx.status = 200;
     } else {
-      console.log("reach concurrency limit");
-      ctx.status = 404;
+      ctx.throw(400, `reach concurrency limit ${concurrencyLimit}`);
     }
   } else {
     // Handle scenario that mulitple servers write into redis
     await removeExceededStreams(userId);
-    console.log("remove exceeded stream");
-    ctx.status = 404;
+    ctx.throw(400, `reach concurrency limit ${concurrencyLimit}`);
   }
 });
 

@@ -1,12 +1,12 @@
 import { redisClient } from "src/libs/redis/client";
-import { sleep } from "src/utils/sleep";
+import { logger } from "src/utils/logger";
 
 export const cleanOldRecords = async (userId: string) => {
   try {
     const timeout = 7 * 24 * 60 * 60 * 1000;
     await redisClient.ZREMRANGEBYSCORE(userId, 0, Date.now() - timeout);
-    console.log("clean old records");
+    logger.info("clean old records");
   } catch {
-    console.log("failed to clean old records");
+    logger.error("failed to clean old records");
   }
 };
