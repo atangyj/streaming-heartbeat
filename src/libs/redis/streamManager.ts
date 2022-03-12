@@ -61,8 +61,7 @@ class StreamManager {
     const timestamp = Date.now();
     const activeStreams = await this.redisClient.zRangeByScoreWithScores(
       userId,
-      // Check heartbeat with 2 times of default interval
-      timestamp - this.heartbeatInterval * 1000 * 2,
+      timestamp - this.heartbeatInterval * 1000,
       timestamp
     );
 
@@ -115,9 +114,10 @@ class StreamManager {
   }
 }
 
-export const redisClient = new StreamManager(
+// Use 2 times of heartbeat interval of client at server side in case temporarily disconnection between client and server
+export const streamManager = new StreamManager(
   RETENTION_DAY,
-  HEARTBEAT_INTERVAL_IN_SECOND,
+  HEARTBEAT_INTERVAL_IN_SECOND * 2,
   CONCURRENCY_LIMIT
 );
 

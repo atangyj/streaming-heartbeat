@@ -2,7 +2,7 @@
 import "dotenv/config";
 import Koa from "koa";
 import koabody from "koa-body";
-import { redisClient } from "src/libs/redis/streamManager";
+import { streamManager } from "src/libs/redis/streamManager";
 
 // Middleware
 import { loggerMiddleware, logger } from "./middlewares/logger";
@@ -24,7 +24,7 @@ app.use(loggerMiddleware);
 app.use(koabody());
 app.use(hearbeat.routes()).use(hearbeat.allowedMethods());
 
-redisClient.connect();
+streamManager.connect();
 
 // Start host
 const server = app.listen(PORT, () => {

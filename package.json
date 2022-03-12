@@ -2,8 +2,8 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "test:unit": "jest --coverage --runInBand --detectOpenHandles --forceExit --passWithNoTests --config jest.config.js tests/unit/storeStream.test",
-    "test:int": "jest --coverage --runInBand --detectOpenHandles --forceExit --passWithNoTests --config jest.config.js tests/integration"
+    "test:unit": "jest --coverage --runInBand --detectOpenHandles --forceExit --passWithNoTests --config jest.config.unit.ts tests/unit/streamManager",
+    "test:int": "jest --coverage --runInBand --detectOpenHandles --forceExit --passWithNoTests --config jest.config.integration.ts tests/integration"
   },
   "devDependencies": {
     "@koa/router": "10.1.1",

@@ -1,7 +1,7 @@
-import { redisClient } from "src/libs/redis/streamManager";
+import { streamManager } from "src/libs/redis/streamManager";
 import { server } from "src/index";
 
 afterAll(async () => {
-  redisClient.disconnect();
+  streamManager.disconnect();
   server.close();
 });
