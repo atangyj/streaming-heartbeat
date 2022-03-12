@@ -1,7 +1,8 @@
 namespace NodeJS {
   interface ProcessEnv {
-    TIMEOUT: number;
+    HEARTBEAT_INTERVAL_IN_SECOND: number;
     CONCURRENCY_LIMIT: number;
     PORT: number;
+    RETENTION_DAY: number;
   }
 }
