@@ -7,4 +7,5 @@ module.exports = {
     "tests/(.*)": "<rootDir>/__tests__/$1",
   },
   collectCoverageFrom: ["src/**/*.ts"],
+  setupFilesAfterEnv: ["./jest.setup.ts"],
 };

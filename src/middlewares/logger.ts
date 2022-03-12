@@ -1,11 +1,16 @@
 // Lib
 import { Context, HttpError, Next } from "koa";
+import winston from "winston";
 
-// Util
-import { logger } from "src/utils/logger";
-import { HTTPError } from "superagent";
+export const logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "info.log", level: "info" }),
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+  ],
+});
 
-export const loggerMiddle = async (ctx: Context, next: Next) => {
+export const loggerMiddleware = async (ctx: Context, next: Next) => {
   try {
     logger.info(`request url: ${ctx.URL}`);
     await next();
