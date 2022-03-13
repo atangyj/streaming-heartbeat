@@ -8,10 +8,9 @@ import correlator from "correlation-id";
 const { combine, timestamp, prettyPrint } = format;
 
 export const getReqInfo = (ctx: Context) => {
-  const { hostname, ip, url, body: reqBody } = ctx.request;
+  const { hostname, url, body: reqBody } = ctx.request;
   const log = {
     hostname,
-    ip,
     url,
     reqBody,
   };
