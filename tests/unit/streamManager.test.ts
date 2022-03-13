@@ -1,6 +1,6 @@
 // Lib
 import { v4 as uuidV4 } from "uuid";
-import { StreamManager } from "src/libs/redis/streamManager";
+import { StreamManager } from "src/libs/streamManager";
 
 // Util
 import { sleep } from "src/utils/sleep";

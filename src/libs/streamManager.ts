@@ -51,7 +51,7 @@ class StreamManager {
     await this.redisClient.zAdd(userId, [
       { score: Date.now(), value: `stream:${streamId}_session:${sessionId}` },
     ]);
-    logger.info(`allow user ${userId} to request stream ${streamId}`);
+    logger.info(`allow stream request`);
   }
 
   public async getActiveStreams(userId: string): Promise<Stream[]> {
@@ -106,7 +106,7 @@ class StreamManager {
       );
       logger.info(`clean old records of user ${userId}`);
     } catch (e) {
-      logger.error(`failed to clean old records ${e}`);
+      logger.error(`failed to clean old records`, e);
     }
   }
 }

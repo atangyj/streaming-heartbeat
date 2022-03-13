@@ -1,4 +1,4 @@
-import { streamManager } from "src/libs/redis/streamManager";
+import { streamManager } from "src/libs/streamManager";
 import { server } from "src/index";
 
 afterAll(async () => {

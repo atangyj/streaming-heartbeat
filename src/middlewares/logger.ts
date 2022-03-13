@@ -1,28 +1,61 @@
 // Lib
 import { Context, HttpError, Next } from "koa";
-import winston from "winston";
+import { createLogger, format, transports } from "winston";
+import correlator from "correlation-id";
 
-export const logger = winston.createLogger({
+// Util
+// import { getLogInfo } from "src/utils/logInfo";
+const { combine, timestamp, prettyPrint } = format;
+
+export const getReqInfo = (ctx: Context) => {
+  const { hostname, ip, url, body: reqBody } = ctx.request;
+  const log = {
+    hostname,
+    ip,
+    url,
+    reqBody,
+  };
+  return log;
+};
+
+export const correlationIdFormat = () => {
+  return format((info) => {
+    const correlationId = correlator.getId();
+    if (correlationId) {
+      info.correlationId = correlationId;
+    }
+    return info;
+  })();
+};
+
+export const logger = createLogger({
+  format: combine(timestamp(), correlationIdFormat(), prettyPrint()),
   transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: "info.log", level: "info" }),
-    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new transports.Console(),
+    new transports.File({ filename: "info.log", level: "info" }),
+    new transports.File({ filename: "error.log", level: "error" }),
   ],
 });
 
 export const loggerMiddleware = async (ctx: Context, next: Next) => {
   try {
-    logger.info(`request url: ${ctx.URL}`);
     await next();
+    const req = getReqInfo(ctx);
+    const { message, status } = ctx.response;
+    logger.info({ ...req, message, status });
   } catch (e) {
     if (e instanceof HttpError) {
-      logger.warn(e);
-      ctx.status = e.status;
-      ctx.body = { message: e.message };
+      const { status, message } = e;
+      const req = getReqInfo(ctx);
+      logger.warn({ ...req, message, status });
+      ctx.status = status;
+      ctx.body = message;
     } else {
       const err = e as Error;
-      logger.error(err.stack);
-      ctx.throw(500);
+      const { message, stack } = err;
+      const req = getReqInfo(ctx);
+      logger.error({ ...req, message, status: 500, stack });
+      ctx.status = 500;
     }
   }
 };

@@ -2,7 +2,7 @@
 import { Context } from "koa";
 import "dotenv/config";
 import Router from "koa-router";
-import { streamManager } from "src/libs/redis/streamManager";
+import { streamManager } from "src/libs/streamManager";
 
 // Type
 import { StreamQuery } from "types/stream";
@@ -14,13 +14,13 @@ router.post("/heartbeat", async (ctx: Context): Promise<void> => {
 
   // Validate queries
   if (!userId || !streamId || !sessionId) {
-    const message = {
-      userId: userId || "missing",
-      streamId: streamId || "missing",
-      sessionId: sessionId || "missing",
-    };
+    const errorMessage = `${
+      (!userId && "userId") ||
+      (!streamId && "streamId") ||
+      (!sessionId && "sessionId")
+    } is missing`;
 
-    ctx.throw(400, JSON.stringify(message));
+    ctx.throw(400, errorMessage);
   }
 
   const activeStreams = await streamManager.getActiveStreams(userId);
@@ -35,13 +35,14 @@ router.post("/heartbeat", async (ctx: Context): Promise<void> => {
     (activeStreams.length === streamManager.concurrencyLimit &&
       streamStatus.playing);
 
-  // Clear stream records older than 1 week
-  // No need to wait for clearing records completes
-  streamManager.clearOldStreams(userId);
-
   if (canContinuePlay) {
     // Under concurrency limit, can continue play
     await streamManager.storeStream(userId, streamId, sessionId);
+
+    // Clear stream records older than 1 week
+    // No need to wait for clearing records completes
+    streamManager.clearOldStreams(userId);
+
     ctx.status = 200;
   } else {
     // Reach concurrency limit
