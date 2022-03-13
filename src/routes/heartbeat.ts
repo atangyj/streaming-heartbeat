@@ -24,8 +24,7 @@ router.post("/heartbeat", async (ctx: Context): Promise<void> => {
   }
 
   const activeStreams = await streamManager.getActiveStreams(userId);
-  const streamStatus = await streamManager.getStreamStatus(
-    userId,
+  const streamStatus = streamManager.getStreamStatus(
     streamId,
     sessionId,
     activeStreams
@@ -35,6 +34,10 @@ router.post("/heartbeat", async (ctx: Context): Promise<void> => {
     activeStreams.length < streamManager.concurrencyLimit ||
     (activeStreams.length === streamManager.concurrencyLimit &&
       streamStatus.playing);
+
+  // Clear stream records older than 1 week
+  // No need to wait for clearing records completes
+  streamManager.clearOldStreams(userId);
 
   if (canContinuePlay) {
     // Under concurrency limit, can continue play

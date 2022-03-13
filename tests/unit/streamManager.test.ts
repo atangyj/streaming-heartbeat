@@ -4,12 +4,8 @@ import { StreamManager } from "src/libs/redis/streamManager";
 
 // Util
 import { sleep } from "src/utils/sleep";
-import exp from "constants";
 
 const streamManager = new StreamManager(1, 3, 3);
-beforeAll(async () => {
-  streamManager.connect();
-});
 
 afterAll(async () => {
   streamManager.disconnect();
@@ -141,18 +137,8 @@ describe("test getStreamStatus", () => {
     );
 
     // Action
-    const status1 = await streamManager.getStreamStatus(
-      userId,
-      stream1,
-      sessionId,
-      streams
-    );
-    const status2 = await streamManager.getStreamStatus(
-      userId,
-      stream2,
-      sessionId,
-      streams
-    );
+    const status1 = streamManager.getStreamStatus(stream1, sessionId, streams);
+    const status2 = streamManager.getStreamStatus(stream2, sessionId, streams);
 
     // Assert
     expect(status1.playing).toBe(true);

@@ -24,8 +24,6 @@ app.use(loggerMiddleware);
 app.use(koabody());
 app.use(hearbeat.routes()).use(hearbeat.allowedMethods());
 
-streamManager.connect();
-
 // Start host
 const server = app.listen(PORT, () => {
   logger.info(`listening on port ${PORT}`);

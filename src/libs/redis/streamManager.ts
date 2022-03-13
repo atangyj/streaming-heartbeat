@@ -30,9 +30,6 @@ class StreamManager {
     this.retentionDay = retentionDay;
     this.heartbeatInterval = heartbeatInterval;
     this.concurrencyLimit = concurrencyLimit;
-  }
-
-  connect() {
     this.redisClient.on("connect", () => {
       logger.info(`connected to redis`);
     });
@@ -68,12 +65,11 @@ class StreamManager {
     return activeStreams;
   }
 
-  public async getStreamStatus(
-    userId: string,
+  public getStreamStatus(
     streamId: string,
     sessionId: string,
     activeStreams: Stream[]
-  ): Promise<{ playing: boolean }> {
+  ): { playing: boolean } {
     const streamMap = activeStreams.reduce(
       (map: StreamMap, stream): StreamMap => {
         const { value: streamId, score: timestamp } = stream;
@@ -93,19 +89,20 @@ class StreamManager {
     userId: string,
     activeStreamsCount: number
   ): Promise<void> {
-    if (activeStreamsCount > 3) {
+    if (activeStreamsCount > this.concurrencyLimit) {
       await this.redisClient.zPopMax(userId);
       logger.info(`remove exceeded request of user ${userId}`);
     }
   }
 
-  public async cleanOldStreams(userId: string): Promise<void> {
+  public async clearOldStreams(userId: string): Promise<void> {
+    // Clear stream records which are older than 1 week
     // Failed to clean old stream records does not affect the api behaviour so catch the error instead of propagate
     try {
       await this.redisClient.ZREMRANGEBYSCORE(
         userId,
         0,
-        Date.now() - this.retentionDay
+        Date.now() - this.retentionDay * 24 * 60 * 60 * 1000 // rentention time in milliseconds
       );
       logger.info(`clean old records of user ${userId}`);
     } catch (e) {
