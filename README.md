@@ -91,6 +91,12 @@ The in-memoery store nature of Redis fulfills this need.
 **Cons**: The service lost the concurreny status if Redis server is down, 
 but losing the data will not block the users from watching video after the Redis server recovers.
 
+### Compared to SQL database
+The throughput of Redis is higher than a SQL database because Redis does not write data to disk.
+
+### Compared to DynamoDB
+DynamoDB also has good performance but using it is expensive. It's charging for reading and writing to DynamoDB but persistence is not important for this api.
+
 ## Logging & Monitoring
 
 ### Log structure
