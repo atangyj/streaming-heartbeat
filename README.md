@@ -15,7 +15,7 @@ This api is to handle this scenario. It allows an user account to watch 3 videos
 - A client should stop or continue to play based on the server response.
 
 ### Request
-Assuming a client already has the video data, the client should call the endpoint with **20 seconds interval** with request body
+Assuming a client already has the video data, the client should call the endpoint with **20 seconds interval** with request body:
 ```
 {
 "userId": "string",
@@ -73,7 +73,7 @@ $ npm run test:unit
 
 ### Integration test
 
-Integration test covers the behavioir of this api
+Integration test covers the behavioir of this api.
 ```
 $ npm run test:int
 ```
@@ -113,10 +113,13 @@ DynamoDB also has good performance but using it is expensive. It's charging for 
   correlationId: '4a010eb4-df6f-4466-80ed-8d7047f0824e'
 }
 ```
+
 **Levels of log**
 - info: 200
 - warn: 400
 - error: 500
+
+*Additional **stack** field is added for error level log*
 
 ### Monior end-to-end journey of api requests
 
@@ -149,6 +152,6 @@ Following is a example journey from allowing streaming, reponsing to client and 
 ```
 
 ### Monitoring health status
-Developers can group the responses by **hostname** and **level** to monitor the server health status
+Developers can group the responses by **hostname** and **level** to monitor the server health status.
 
 
