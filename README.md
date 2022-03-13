@@ -104,12 +104,12 @@ but losing the data will not block the users from watching video after the Redis
   correlationId
 }
 ```
-#### Levels
+**Levels of log**
 - info: 200
 - warn: 400
 - error: 500
 
-#### Monior end-to-end journey of api requests
+### Monior end-to-end journey of api requests
 
 **CorrelationId** is added through the api request flow. 
 Following is a example journey from allowing streaming, reponsing to client and clearing old stream records for a request
