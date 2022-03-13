@@ -120,6 +120,23 @@ DynamoDB also has good performance but using it is expensive. It's charging for 
 - error: 500
 
 *Additional **stack** field is added for error level log*
+```
+{
+  hostname: 'localhost',
+  url: '/heartbeat',
+  reqBody: undefined,
+  message: 'Unexpected token } in JSON at position 41',
+  status: 500,
+  stack: 'SyntaxError: Unexpected token } in JSON at position 41\n' +
+    '    at JSON.parse (<anonymous>)\n' +
+    '    at parse (/Users/tyj/testing/streaming-heartbeat/node_modules/koa-body/node_modules/co-body/lib/json.js:62:17)\n' +
+    '    at /Users/tyj/testing/streaming-heartbeat/node_modules/koa-body/node_modules/co-body/lib/json.js:45:22\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:94:5)',
+  level: 'error',
+  timestamp: '2022-03-13T16:25:45.226Z',
+  correlationId: '4f788224-0d1d-4891-a1b4-99380538d4a5'
+}
+```
 
 ### Monior end-to-end journey of api requests
 
