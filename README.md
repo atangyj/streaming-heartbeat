@@ -29,6 +29,8 @@ Assuming a client already has the video data, the client should call the endpoin
 - 400 - reach concurrency limit
 - 500 - internal server error
 
+### Node v15.6.0
+
 ## Start the API service locally
 
 ### Prerequisite
