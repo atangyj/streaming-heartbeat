@@ -1,9 +1,9 @@
 ## Scenario
 
 Many streaming service users will share their account with family and friends 
-and split the cost of subscribing a service. To satisfy the user need and control the operation cost, a service provider can provide a subscription plan which allows limited people use a single account.
+and split the cost of subscribing a service. To satisfy the user need and control the operation cost, a service provider can provide a subscription plan which allows limited people to use a single account.
 
-This api is to handle this scenario. It allows an user account watch 3 videos at maximum conconcurrently. 
+This api is to handle this scenario. It allows an user account to watch 3 videos at maximum conconcurrently. 
 - It can be 3 people watch the same video or different video with the same user id at the same time.
 - It can be a person watch 3 different videos simultaneouly.
 
@@ -44,6 +44,7 @@ $ docker run -p 6379:6379 --name redis-server -d redis
 
 ### Start service
 ```
+$ npm install
 $ npm start
 ```
 The service will be running on ```http://localhost:8080```
@@ -71,7 +72,7 @@ $ npm run test:unit
 ### Integration test
 
 Integration test covers the behavioir of this api
-```Run tests
+```
 $ npm run test:int
 ```
 
@@ -79,7 +80,7 @@ $ npm run test:int
 
 ### Database - Redis
 
-Multiple servers will be running in response to increaing requests. 
+Multiple api servers will be running in response to increaing requests. 
 The concurreny status of users should be shared across servers. 
 The store should satisfy good performance under heavy queries 
 because the client will call api with 20 seconds interval.
@@ -94,14 +95,14 @@ but losing the data will not block the users from watching video after the Redis
 
 ```
 {
-  hostname
-  url
-  reqBody
-  message
-  status
-  level
-  timestamp
-  correlationId
+  hostname: 'localhost',
+  url: '/heartbeat',
+  reqBody: { userId: 'foo', streamId: 'bar', sessionId: 'foobar' },
+  message: 'OK',
+  status: 200,
+  level: 'info',
+  timestamp: '2022-03-13T16:48:57.532Z',
+  correlationId: '4a010eb4-df6f-4466-80ed-8d7047f0824e'
 }
 ```
 **Levels of log**
@@ -114,7 +115,8 @@ but losing the data will not block the users from watching video after the Redis
 **CorrelationId** is added through the api request flow. 
 Following is a example journey from allowing streaming, reponsing to client and clearing old stream records for a request
 
-```{
+```
+{
   message: 'allow stream request',
   level: 'info',
   timestamp: '2022-03-13T16:48:57.532Z',
